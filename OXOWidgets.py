@@ -10,7 +10,10 @@ class TicTacToe(QWidget):
         self.setGeometry(250,250,200, 150)
         
         # Creating the game labels 
-        self.title_label = QLabel("ULTIMATE OXO GAME", self)   
+        self.title_label = QLabel("ULTIMATE OXO GAME", self)  
+        self.title_label.setFont(QFont("Orbitron", 20, ))
+        self.title_label.setStyleSheet("colour: #3ABEFF;")
+        
         self.slogan= QLabel("The Ultimate Tic-Tac-Toe Experience")
         self.info=QLabel("Click on a cell to make your move")
         self.info2=QLabel("Example: 192.168.1.10")
@@ -76,6 +79,9 @@ class TicTacToe(QWidget):
         grid1.addWidget(self.info2,2,0)
         grid_widget1=QWidget()
         grid_widget1.setLayout(grid1)
+        grid_widget1.setPalette(QPalette(QColor('#003153')))
+        grid_widget1.setAutoFillBackground(True)
+        
         
         #Players panel
         grid2 = QGridLayout()
@@ -86,6 +92,9 @@ class TicTacToe(QWidget):
         grid2.addWidget(Olab, 2,1)
         grid_widget2=QWidget()
         grid_widget2.setLayout(grid2)
+        grid_widget2.setPalette(QPalette(QColor('#003153')))
+        grid_widget2.setAutoFillBackground(True)
+        
         
         #Game messages panel 
         grid3= QGridLayout()
@@ -93,6 +102,9 @@ class TicTacToe(QWidget):
         grid3.addWidget(self.serveroutput,1,0)
         grid_widget3= QWidget()
         grid_widget3.setLayout(grid3)
+        grid_widget3.setPalette(QPalette(QColor('#003153')))
+        grid_widget3.setAutoFillBackground(True)
+        
     
         
         #Combined game panel grid 
@@ -116,13 +128,17 @@ class TicTacToe(QWidget):
         vbox2.addWidget(cross_gridWidget)
         vbox2_widget = QWidget()
         vbox2_widget.setLayout(vbox2)
-        
+        vbox2_widget.setPalette(QPalette(QColor('#003153')))
+        vbox2_widget.setAutoFillBackground(True)       
         
         hbox = QHBoxLayout() 
         hbox.addWidget(vbox2_widget)
         hbox.addWidget(vbox_widget)
         hbox_widget= QWidget()
         hbox_widget.setLayout(hbox)
+        hbox_widget.setPalette(QPalette(QColor('#002147')))
+        hbox_widget.setAutoFillBackground(True)        
+                
           
         #Buttons Panel 
         Hbox = QHBoxLayout()
@@ -131,6 +147,8 @@ class TicTacToe(QWidget):
         Hbox.addWidget(self.closebutton)
         Hbox_widget = QWidget()
         Hbox_widget.setLayout(Hbox)
+        Hbox_widget.setPalette(QPalette(QColor('#003153')))
+        Hbox_widget.setAutoFillBackground(True)  
         
         #Putting everything together 
         Final_vbox = QVBoxLayout()
