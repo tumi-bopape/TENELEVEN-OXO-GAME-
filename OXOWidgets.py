@@ -29,9 +29,16 @@ class TicTacToe(QWidget):
         
         #Creating the game buttons 
         self.closebutton= QPushButton("EXIT",self) 
+        self.closebutton.clicked.connect(self.cancel_clicked)
+        
         self.newgamebutton= QPushButton("NEW GAME", self)
+        self.newgamebutton.clicked.connect(self.button_clicked)
+        
         self.serverbutton =QPushButton("CONNECT", self)
+        self.serverbutton.clicked.connect(self.button_clicked)
+        
         self.restartbutton =QPushButton("RESTART",self)
+        self.restartbutton.clicked.connect(self.button_clicked)
         
         #Creating text spaces 
         self.enterserver =QLineEdit(self)
@@ -46,6 +53,7 @@ class TicTacToe(QWidget):
                 cross_grid.addWidget(self.button,i,j)
         cross_gridWidget = QWidget()
         cross_gridWidget.setLayout(cross_grid)
+        self.cross_grid.clicked.connect(self.button_clicked)
        
         
         #Creating the X and O images 
@@ -129,6 +137,11 @@ class TicTacToe(QWidget):
         Final_vbox.addWidget(Hbox_widget)
         self.setLayout(Final_vbox)
         
+    def button_clicked(self):
+            print("Button was clicked") 
+            
+    def cancel_clicked(self): 
+        self.close()     
     
    
 if __name__ == "__main__":
