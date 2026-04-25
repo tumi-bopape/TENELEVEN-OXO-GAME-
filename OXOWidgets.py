@@ -32,13 +32,13 @@ class TicTacToe(QWidget):
         self.closebutton.clicked.connect(self.cancel_clicked)
         
         self.newgamebutton= QPushButton("NEW GAME", self)
-        self.newgamebutton.clicked.connect(self.button_clicked)
+        self.newgamebutton.clicked.connect(self.new_game_button_clicked)
         
         self.serverbutton =QPushButton("CONNECT", self)
-        self.serverbutton.clicked.connect(self.button_clicked)
+        self.serverbutton.clicked.connect(self.connect_button_clicked)
         
         self.restartbutton =QPushButton("RESTART",self)
-        self.restartbutton.clicked.connect(self.button_clicked)
+        self.restartbutton.clicked.connect(self.restart_button_clicked)
         
         #Creating text spaces 
         self.enterserver =QLineEdit(self)
@@ -50,10 +50,11 @@ class TicTacToe(QWidget):
         for i in range(0,3):
             for j in range(0,3):
                 self.button = QPushButton("")
+                self.button.clicked.connect(self.button_clicked)
                 cross_grid.addWidget(self.button,i,j)
         cross_gridWidget = QWidget()
         cross_gridWidget.setLayout(cross_grid)
-        self.cross_grid.clicked.connect(self.button_clicked)
+       
        
         
         #Creating the X and O images 
@@ -137,8 +138,17 @@ class TicTacToe(QWidget):
         Final_vbox.addWidget(Hbox_widget)
         self.setLayout(Final_vbox)
         
-    def button_clicked(self):
-            print("Button was clicked") 
+    def grid_button_clicked(self):
+            print("Grid button was clicked")
+        
+    def new_game_button_clicked(self):
+            print("New game button was clicked")     
+    
+    def connect_button_clicked(self):
+            print("Connect button was clicked") 
+
+    def restart_button_clicked(self):
+            print("Restart button was clicked") 
             
     def cancel_clicked(self): 
         self.close()     
