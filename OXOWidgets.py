@@ -48,6 +48,8 @@ class TicTacToe(QWidget):
         
         self.player1= QLabel("Player 1",self)
         self.player2 = QLabel("Player 2",self)    
+        self.identify1 = QLabel("You", self)
+        self.identify2 = QLabel("Opponent", self)
         
         self.player_design_labelX = QLabel("", self)
         self.player_design_labelO = QLabel("",self)          
@@ -128,6 +130,8 @@ class TicTacToe(QWidget):
         grid2.addWidget(self.player, 0,0)
         grid2.addWidget(self.player1,1,0)
         grid2.addWidget(self.player2,2,0)
+        grid2.addWidget(self.identify1, 1,2)
+        grid2.addWidget(self.identify2, 2,2)
         grid2.addWidget(Xlab, 1,1)
         grid2.addWidget(Olab, 2,1)
         grid_widget2=QWidget()
