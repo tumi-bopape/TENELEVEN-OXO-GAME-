@@ -4,9 +4,7 @@ from PyQt5.QtWidgets import*
 from PyQt5.QtGui import*
 from PyQt5.QtCore import Qt 
 
-
-
-class OXOTextClient(GameClient, QWidget):
+class OXOGUIClient(GameClient, QWidget):
 
     def __init__(self):
         GameClient.__init__(self)
@@ -213,8 +211,11 @@ class OXOTextClient(GameClient, QWidget):
             print("New game button was clicked")     
     
     def connect_button_clicked(self):
-            print("Connect button was clicked") 
-
+        self.IP = self.enterserver.text()
+        self.connect_to_server(self.IP)
+        self.play_loop()
+         
+                
     def restart_button_clicked(self):
             print("Restart button was clicked") 
             
@@ -224,13 +225,12 @@ class OXOTextClient(GameClient, QWidget):
     def clear_board(self):
         self.board = [' '] * BOARD_SIZE
 
-
 # The job of display board is to update the board.
     def display_on_board(self):   
         pass 
     
     def handle_message(self,msg):
-        pass
+        print(msg)
     
     def play_loop(self):
         while True:
@@ -241,8 +241,7 @@ class OXOTextClient(GameClient, QWidget):
 def main():
         
     app = QApplication(sys.argv)
-    game = OXOTextClient()
+    game = OXOGUIClient()
     game.show()
     sys.exit(app.exec_())
-    
 main()
