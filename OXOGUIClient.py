@@ -236,7 +236,7 @@ class OXOGUIClient(GameClient, QWidget):
         while True:
             msg = self.receive_message()
             if len(msg): self.handle_message(msg)
-            else: break
+            break
             
 def main():
         
