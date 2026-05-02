@@ -230,21 +230,22 @@ class OXOGUIClient(GameClient, QWidget):
         pass 
     
     def handle_message(self,msg):
+        ef handle_message(self,msg):
         if msg.startswith('new game,'):
             self.shape = msg.split(',')[1] #SPLIT THE STRING AS A LIST AND USE THE INDEX 1
             self.clear_board()
             print(f"\n New Game! You are playing as {self.shape}")
-            self.display_board()
+            self.display_on_board()
            
-        elif msg == 'your move': 
+        elif msg.startswith('your move'): 
             print("It's your turn!")
             move = self.input_move()
             self.send_message(move)
         
-        elif msg == 'opponents move':
+        elif msg.startswith('opponents move'):
             print("Waiting for opponent's move...")
         
-        elif msg == 'invalid move':
+        elif msg.startswith('invalid move'):
             print("Invalid move! That position is taken or out of range.")
         
         elif msg.startswith('valid move,'):
@@ -252,11 +253,11 @@ class OXOGUIClient(GameClient, QWidget):
             shape = parts[1] 
             position = int(parts[2])
             self.board[position] = shape
-            self.display_board()
+            self.display_on_board()
         
         elif msg.startswith('game over,'):
             winner = msg.split(',')[1]
-            self.display_board()
+            self.display_on_board()
             if winner == 'X':
                 print("Game Over! X wins!")
                 if self.shape == 'X':
@@ -285,7 +286,6 @@ class OXOGUIClient(GameClient, QWidget):
             
         else:
             print(f"Received unknown message: {msg}")
-        
     
     def play_loop(self):
         while True:
