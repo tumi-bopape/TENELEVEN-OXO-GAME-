@@ -239,24 +239,35 @@ class OXOGUIClient(GameClient, QWidget):
         self.serveroutput.setText("Requesting new game...")
     
     def connect_button_clicked(self):
-        """Connect to server"""
+        """Connect to server and start the background listener"""
         self.IP = self.enterserver.text()
+        
+        # 1. Update status so user knows we are trying
+        self.statusbar.setText(f"Connecting to {self.IP}...")
+        self.statusbar.setStyleSheet("color: yellow;")
+        
         try:
-            if self.connect_to_server(self.IP):
-                self.statusbar.setText("Connected! Waiting for player...")
-                self.statusbar.setStyleSheet("background-color: #002147; color: green;")
-                self.serverbutton.setEnabled(False)
-                self.enterserver.setEnabled(False)
-                
-                # Start message receiving thread
-                self.thread = threading.Thread(target=self.play_loop, daemon=True)
-                self.thread.start()
-            else:
-                self.statusbar.setText("Connection failed!")
-                self.statusbar.setStyleSheet("background-color: #002147; color: red;")
+            # 2. Attempt connection
+            self.connect_to_server(self.IP)
+            
+            # 3. Force the connection flag to True
+            self.connected = True 
+            
+            # 4. UI Updates
+            self.statusbar.setText("Connected! Waiting for game...")
+            self.statusbar.setStyleSheet("background-color: #002147; color: #00FF00;")
+            self.serverbutton.setEnabled(False)
+            self.enterserver.setEnabled(False)
+            
+            # 5. Start the background thread
+            self.thread = threading.Thread(target=self.play_loop, daemon=True)
+            self.thread.start()
+            
         except Exception as e:
-            self.statusbar.setText(f"Connection failed: {str(e)}")
-    
+            self.connected = False
+            self.statusbar.setText("Connection failed!")
+            self.statusbar.setStyleSheet("background-color: #002147; color: #FF3131;")
+            print(f"Connect Error: {e}")
     def restart_button_clicked(self):
         """Clear the local board"""
         self.clear_board()
