@@ -239,23 +239,24 @@ class OXOGUIClient(GameClient, QWidget):
         pass 
     
     def handle_message(self,msg):
+        self.serveroutput.setText(msg)
         
         if msg.startswith('new game,'):
             self.shape = msg.split(',')[1] #SPLIT THE STRING AS A LIST AND USE THE INDEX 1
             self.clear_board()
-            print(f"\n New Game! You are playing as {self.shape}")
+            self.statusbar.setText(f"Playing as: {self.shape}")
             self.display_on_board()
            
         elif msg.startswith('your move'): 
-            print("It's your turn!")
+            self.info.setText("It's your turn!")
             move = self.input_move()
             self.send_message(move)
         
         elif msg.startswith('opponents move'):
-            print("Waiting for opponent's move...")
+            self.info.setText("Waiting for opponent...")
         
         elif msg.startswith('invalid move'):
-            print("Invalid move! That position is taken or out of range.")
+            self.info.setText("Invalid move! Try again.")
         
         elif msg.startswith('valid move,'):
             parts = msg.split(',')
@@ -263,24 +264,15 @@ class OXOGUIClient(GameClient, QWidget):
             position = int(parts[2])
             self.board[position] = shape
             self.display_on_board()
-        
+            
         elif msg.startswith('game over,'):
             winner = msg.split(',')[1]
-            self.display_on_board()
-            if winner == 'X':
-                print("Game Over! X wins!")
-                if self.shape == 'X':
-                    print("You won!")
-                else:
-                    print("You lost!")
-            elif winner == 'O':
-                print("Game Over! O wins!")
-                if self.shape == 'O':
-                    print("You won!")
-                else:
-                    print("You lost!")
-            else:  
-                print("Game Over! It's a tie!")
+            if winner == self.shape:
+                self.info.setText("GAME OVER: YOU WON!")
+            elif winner == 'tie':
+                self.info.setText("GAME OVER: IT'S A TIE!")
+            else:
+                self.info.setText("GAME OVER: YOU LOST!")
         
         elif msg == 'play again':
                 play_again = self.input_play_again()
@@ -290,7 +282,7 @@ class OXOGUIClient(GameClient, QWidget):
                     self.send_message('n')
           
         elif msg == 'exit game':
-                print("Game exiting...")
+                self.statusbar.setText("Server closed connection.")
                 self.socket.close()
             
         else:
