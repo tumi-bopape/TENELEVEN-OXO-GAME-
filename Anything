@@ -19,16 +19,13 @@ class OXOGUIClient(GameClient, QWidget):
         self.board = [' '] * BOARD_SIZE
         self.shape = None
         self.buffer = ""
-        self.current_move = None
-        self.waiting_for_move = False
-        self.waiting_play_again = False
-
+        self.move_selected = None
         self.buttons = []
 
         self.setWindowTitle("Ten Eleven Games")
-        self.setGeometry(250, 50, 700, 500)
+        self.setGeometry(250, 50, 750, 500)
 
-        # ---------------- Labels ----------------
+        # ---------------- LABELS ----------------
         self.title_label1 = QLabel("ULTIMATE", self)
         self.title_label1.setFont(QFont("Orbitron", 28, QFont.Bold))
         self.title_label1.setStyleSheet("color:white;")
@@ -56,17 +53,19 @@ class OXOGUIClient(GameClient, QWidget):
         self.server_label = QLabel("Enter server:")
         self.server_label.setStyleSheet("color:white;")
 
-        self.statusbar = QLabel("")
-        self.statusbar.setStyleSheet(
-            "background-color:#002147;color:white;padding:4px;"
-        )
+        self.player = QLabel("Players")
+        self.player.setStyleSheet("color:white;")
 
-        self.serveroutput = QLabel("")
-        self.serveroutput.setStyleSheet(
-            "background-color:#002147;color:white;padding:4px;"
-        )
+        self.player1 = QLabel("Player 1")
+        self.player2 = QLabel("Player 2")
 
-        # ---------------- Buttons ----------------
+        self.identify1 = QLabel("You")
+        self.identify2 = QLabel("Opponent")
+
+        self.game_messages = QLabel("Game Messages:")
+        self.game_messages.setStyleSheet("color:white;")
+
+        # ---------------- BUTTONS ----------------
         self.closebutton = QPushButton("EXIT")
         self.closebutton.clicked.connect(self.cancel_clicked)
 
@@ -79,93 +78,120 @@ class OXOGUIClient(GameClient, QWidget):
         self.restartbutton = QPushButton("RESTART")
         self.restartbutton.clicked.connect(self.restart_button_clicked)
 
-        # ---------------- Input ----------------
+        # ---------------- TEXT AREAS ----------------
         self.enterserver = QLineEdit()
         self.enterserver.setText("127.0.0.1")
 
-        # ---------------- Board ----------------
-        board_grid = QGridLayout()
+        self.serveroutput = QLabel("")
+        self.serveroutput.setFixedHeight(30)
+        self.serveroutput.setStyleSheet(
+            "background:#002147;color:white;padding:5px;"
+        )
+
+        self.statusbar = QLabel("")
+        self.statusbar.setFixedHeight(30)
+        self.statusbar.setStyleSheet(
+            "background:#002147;color:white;padding:5px;"
+        )
+
+        # ---------------- BOARD ----------------
+        cross_grid = QGridLayout()
 
         for i in range(3):
             for j in range(3):
-                btn = QPushButton("")
-                btn.setFixedSize(100, 100)
-                btn.setFont(QFont("Arial", 28, QFont.Bold))
-                btn.setStyleSheet("background-color:white;")
-                btn.clicked.connect(self.grid_button_clicked)
-                self.buttons.append(btn)
-                board_grid.addWidget(btn, i, j)
+                button = QPushButton("")
+                button.setFixedSize(90, 90)
+                button.setFont(QFont("Arial", 26, QFont.Bold))
+                button.clicked.connect(self.grid_button_clicked)
+                button.setStyleSheet("background:white;")
+                self.buttons.append(button)
+                cross_grid.addWidget(button, i, j)
 
-        board_widget = QWidget()
-        board_widget.setLayout(board_grid)
+        cross_gridWidget = QWidget()
+        cross_gridWidget.setLayout(cross_grid)
 
-        # ---------------- Left Layout ----------------
-        left = QVBoxLayout()
-        left.addWidget(self.title_label1)
-        left.addWidget(self.oxo_label)
-        left.addWidget(self.slogan)
-        left.addWidget(self.status_label)
-        left.addWidget(self.statusbar)
-        left.addWidget(board_widget)
-        left.addWidget(self.info)
+        # ---------------- RIGHT PANEL ----------------
+        grid1 = QGridLayout()
+        grid1.addWidget(self.server_label, 0, 0)
+        grid1.addWidget(self.enterserver, 1, 0)
+        grid1.addWidget(self.serverbutton, 1, 1)
+        grid1.addWidget(self.info2, 2, 0)
 
-        # ---------------- Right Layout ----------------
+        grid_widget1 = QWidget()
+        grid_widget1.setLayout(grid1)
+
+        grid2 = QGridLayout()
+        grid2.addWidget(self.player, 0, 0)
+        grid2.addWidget(self.player1, 1, 0)
+        grid2.addWidget(self.player2, 2, 0)
+        grid2.addWidget(self.identify1, 1, 1)
+        grid2.addWidget(self.identify2, 2, 1)
+
+        grid_widget2 = QWidget()
+        grid_widget2.setLayout(grid2)
+
+        grid3 = QVBoxLayout()
+        grid3.addWidget(self.game_messages)
+        grid3.addWidget(self.serveroutput)
+
+        grid_widget3 = QWidget()
+        grid_widget3.setLayout(grid3)
+
         right = QVBoxLayout()
-        right.addWidget(self.server_label)
-        right.addWidget(self.enterserver)
-        right.addWidget(self.serverbutton)
-        right.addWidget(self.info2)
-        right.addSpacing(20)
-        right.addWidget(QLabel("Messages:"))
-        right.addWidget(self.serveroutput)
-        right.addStretch()
+        right.addWidget(grid_widget1)
+        right.addWidget(grid_widget2)
+        right.addWidget(grid_widget3)
 
-        # ---------------- Top Layout ----------------
-        top = QHBoxLayout()
-        top.addLayout(left)
-        top.addLayout(right)
+        # ---------------- LEFT PANEL ----------------
+        top_left = QVBoxLayout()
+        top_left.addWidget(self.title_label1)
+        top_left.addWidget(self.oxo_label)
+        top_left.addWidget(self.slogan)
 
-        # ---------------- Bottom Buttons ----------------
-        bottom = QHBoxLayout()
-        bottom.addWidget(self.newgamebutton)
-        bottom.addWidget(self.restartbutton)
-        bottom.addWidget(self.closebutton)
+        top_left.addWidget(self.status_label)
+        top_left.addWidget(self.statusbar)
+        top_left.addWidget(cross_gridWidget)
+        top_left.addWidget(self.info)
 
-        # ---------------- Main Layout ----------------
+        # ---------------- MAIN ----------------
+        hbox = QHBoxLayout()
+        hbox.addLayout(top_left)
+        hbox.addLayout(right)
+
+        buttons = QHBoxLayout()
+        buttons.addWidget(self.newgamebutton)
+        buttons.addWidget(self.restartbutton)
+        buttons.addWidget(self.closebutton)
+
         main = QVBoxLayout()
-        main.addLayout(top)
-        main.addLayout(bottom)
+        main.addLayout(hbox)
+        main.addLayout(buttons)
 
         self.setLayout(main)
-        self.setStyleSheet("background-color:#003153;")
+        self.setStyleSheet("background:#003153;")
 
-    # =====================================================
-    # BUTTON CLICKED
-    # =====================================================
+    # ==================================================
+    # BUTTON METHODS
+    # ==================================================
 
     def grid_button_clicked(self):
-        if not self.waiting_for_move:
-            return
 
-        button = self.sender()
-        index = self.buttons.index(button)
+        sender = self.sender()
+        index = self.buttons.index(sender)
 
         if self.board[index] == ' ':
-            self.current_move = str(index)
-            self.waiting_for_move = False
+            self.move_selected = str(index)
 
     def new_game_button_clicked(self):
-        try:
-            self.send_message("y")
-        except:
-            pass
+        self.clear_board()
+        self.display_on_board()
 
     def connect_button_clicked(self):
-        ip = self.enterserver.text()
+
+        self.IP = self.enterserver.text()
 
         try:
-            self.statusbar.setText("Connecting...")
-            self.connect_to_server(ip)
+            self.connect_to_server(self.IP)
 
             self.thread = threading.Thread(
                 target=self.play_loop,
@@ -175,8 +201,8 @@ class OXOGUIClient(GameClient, QWidget):
 
             self.statusbar.setText("Connected!")
 
-        except Exception as e:
-            self.statusbar.setText("Connection Failed")
+        except:
+            self.statusbar.setText("Connection failed")
 
     def restart_button_clicked(self):
         self.clear_board()
@@ -185,9 +211,9 @@ class OXOGUIClient(GameClient, QWidget):
     def cancel_clicked(self):
         self.close()
 
-    # =====================================================
-    # BOARD
-    # =====================================================
+    # ==================================================
+    # BOARD METHODS
+    # ==================================================
 
     def clear_board(self):
         self.board = [' '] * BOARD_SIZE
@@ -210,23 +236,20 @@ class OXOGUIClient(GameClient, QWidget):
 
             else:
                 self.buttons[i].setText("")
-                self.buttons[i].setStyleSheet(
-                    "background:white;"
-                )
+                self.buttons[i].setStyleSheet("background:white;")
 
-    # =====================================================
+    # ==================================================
     # INPUT METHODS
-    # =====================================================
+    # ==================================================
 
     def input_move(self):
 
-        self.waiting_for_move = True
-        self.current_move = None
+        self.move_selected = None
 
-        while self.current_move is None:
+        while self.move_selected is None:
             QApplication.processEvents()
 
-        return self.current_move
+        return self.move_selected
 
     def input_play_again(self):
 
@@ -241,73 +264,72 @@ class OXOGUIClient(GameClient, QWidget):
             return 'y'
         return 'n'
 
-    # =====================================================
+    # ==================================================
     # HANDLE SERVER MESSAGE
-    # =====================================================
+    # ==================================================
 
     def handle_message(self, msg):
 
         self.serveroutput.setText(msg)
 
-        if msg.startswith("new game,"):
+        if msg.startswith('new game,'):
 
-            self.shape = msg.split(",")[1]
+            self.shape = msg.split(',')[1]
             self.clear_board()
             self.display_on_board()
 
-            self.statusbar.setText(f"Playing as {self.shape}")
-            self.info.setText("Game Started")
+            self.statusbar.setText(f"Playing as: {self.shape}")
+            self.info.setText("Game started!")
 
-        elif msg.startswith("your move"):
+        elif msg.startswith('your move'):
 
             self.info.setText("Your Turn")
             move = self.input_move()
             self.send_message(move)
 
-        elif msg.startswith("opponents move"):
+        elif msg.startswith('opponents move'):
 
-            self.info.setText("Opponent Turn")
+            self.info.setText("Waiting for opponent...")
 
-        elif msg.startswith("invalid move"):
+        elif msg.startswith('invalid move'):
 
-            self.info.setText("Invalid Move")
+            self.info.setText("Invalid move. Try again.")
 
-        elif msg.startswith("valid move,"):
+        elif msg.startswith('valid move,'):
 
-            parts = msg.split(",")
-
+            parts = msg.split(',')
             shape = parts[1]
             position = int(parts[2])
 
             self.board[position] = shape
             self.display_on_board()
 
-        elif msg.startswith("game over,"):
+        elif msg.startswith('game over,'):
 
-            winner = msg.split(",")[1]
+            winner = msg.split(',')[1]
 
             if winner == self.shape:
                 self.info.setText("YOU WON!")
 
-            elif winner == "tie":
+            elif winner == 'T':
                 self.info.setText("DRAW!")
 
             else:
                 self.info.setText("YOU LOST!")
 
-        elif msg == "play again":
+        elif msg == 'play again':
 
             answer = self.input_play_again()
             self.send_message(answer)
 
-        elif msg == "exit game":
+        elif msg == 'exit game':
 
-            self.statusbar.setText("Disconnected")
+            self.statusbar.setText("Server disconnected")
             self.socket.close()
 
-    # =====================================================
+    # ==================================================
     # THREAD LOOP
-    # =====================================================
+    # ==================================================
 
     def play_loop(self):
 
@@ -329,11 +351,12 @@ class OXOGUIClient(GameClient, QWidget):
                 break
 
 
-# =====================================================
+# ==================================================
 # MAIN
-# =====================================================
+# ==================================================
 
 def main():
+
     app = QApplication(sys.argv)
     game = OXOGUIClient()
     game.show()
