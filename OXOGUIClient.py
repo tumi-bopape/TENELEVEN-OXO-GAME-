@@ -230,7 +230,7 @@ class OXOGUIClient(GameClient, QWidget):
         pass 
     
     def handle_message(self,msg):
-       
+        
         if msg.startswith('new game,'):
             self.shape = msg.split(',')[1] #SPLIT THE STRING AS A LIST AND USE THE INDEX 1
             self.clear_board()
@@ -291,7 +291,7 @@ class OXOGUIClient(GameClient, QWidget):
         while True:
             msg = self.receive_message()
             if len(msg): self.handle_message(msg)
-            break
+            else:break
             
 def main():
         
