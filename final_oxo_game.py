@@ -7,7 +7,6 @@ from GameIni import *
 
 class TicTacToe(QWidget, GameClient):
     def __init__(self):
-        # Initialize both parent classes
         QWidget.__init__(self)
         GameClient.__init__(self)
         
@@ -19,7 +18,7 @@ class TicTacToe(QWidget, GameClient):
         self.score_x = 0
         self.score_o = 0
         
-        # Setup Timer to check for server messages every 100ms
+        # Setup Timer
         self.network_timer = QTimer()
         self.network_timer.timeout.connect(self.check_network)
         
@@ -80,7 +79,6 @@ class TicTacToe(QWidget, GameClient):
                 row.append(btn)
             self.board_buttons.append(row)
 
-        # Centering Layout for Grid
         grid_wrapper = QHBoxLayout()
         grid_wrapper.addStretch()
         grid_wrapper.addLayout(cross_grid)
@@ -98,13 +96,13 @@ class TicTacToe(QWidget, GameClient):
         self.closebutton = QPushButton("EXIT", self) 
         self.closebutton.clicked.connect(self.close)
 
-        # Score Display (Right Panel)
+        # Score Display
         self.score_display = QLabel("X: 0  |  O: 0")
         self.score_display.setFont(QFont("Orbitron", 16, QFont.Bold))
         self.score_display.setAlignment(Qt.AlignCenter)
-        self.score_display.setStyleSheet("color: ##FFA500; border: 1px solid gray; padding: 5px;")
+        self.score_display.setStyleSheet("color: #FFFFFF; padding: 5px; border: 1px solid #555;")
 
-        # Layout Arrangement
+        # Layouts
         left_panel = QVBoxLayout()
         left_panel.addWidget(self.title_label1)
         left_panel.addWidget(self.oxo_label)
@@ -150,10 +148,11 @@ class TicTacToe(QWidget, GameClient):
 
     def check_network(self):
         try:
-            self.socket.setblocking(False)
-            msg = self.receive_message()
-            if msg:
-                self.handle_message(msg)
+            if hasattr(self, 'socket') and self.socket:
+                self.socket.setblocking(False)
+                msg = self.receive_message()
+                if msg:
+                    self.handle_message(msg)
         except:
             pass
 
@@ -177,8 +176,10 @@ class TicTacToe(QWidget, GameClient):
             r, c = int(pos) // 3, int(pos) % 3
             self.board_buttons[r][c].setText(shape)
             self.board_buttons[r][c].setEnabled(False)
-            color = "#FF3131" if shape == 'X' else "#2323FF"
-            self.board_buttons[r][c].setStyleSheet(f"color: {color};")
+            
+            # Apply color based on mark
+            color = "#FF3131" if shape == 'X' else "#04D9FF"
+            self.board_buttons[r][c].setStyleSheet(f"color: {color}; background-color: rgba(255,255,255,10%); border: 1px solid gray;")
         
         elif msg.startswith('game over,'):
             winner = msg.split(',')[1]
@@ -197,7 +198,7 @@ class TicTacToe(QWidget, GameClient):
                 
             self.score_display.setText(f"X: {self.score_x}  |  O: {self.score_o}")
             self.statusbar.setText(f"MATCH OVER: {result}")
-            self.serveroutput.setText(f"Result: {result}. Press RESTART to play again.")
+            self.serveroutput.setText(f"Result: {result}. Press RESTART for another round or NEW MATCH to disconnect.")
 
     def grid_button_clicked(self):
         sender = self.sender()
@@ -218,29 +219,48 @@ class TicTacToe(QWidget, GameClient):
             self.serveroutput.setText(f"Connection Error: {e}")
 
     def new_game_clicked(self):
-        try: self.send_message('y'); self.clear_gui_board()
-        except: pass
+        """Resets scoreboard, clears board, and disconnects."""
+        self.clear_gui_board()
+        self.score_x = 0
+        self.score_o = 0
+        self.score_display.setText("X: 0  |  O: 0")
+        
+        try:
+            self.network_timer.stop()
+            if hasattr(self, 'socket') and self.socket:
+                self.socket.close()
+                self.socket = None 
+                
+            self.statusbar.setText("Disconnected. Enter IP to start.")
+            self.serveroutput.setText("Session ended. Scoreboard reset.")
+            self.serverbutton.setEnabled(True)
+            self.enterserver.setEnabled(True)
+        except Exception as e:
+            self.serveroutput.setText(f"Reset Error: {e}")
 
     def restart_clicked(self):     
         self.clear_gui_board()
         try: self.send_message('y')
-        except: pass
+        except: self.serveroutput.setText("Not connected to a server.")
 
     def clear_gui_board(self):
         for i in range(3):
             for j in range(3):
                 self.board_buttons[i][j].setText("")
                 self.board_buttons[i][j].setEnabled(False)
-                self.board_buttons[i][j].setStyleSheet("")
+                # Keep the buttons visible against the background
+                self.board_buttons[i][j].setStyleSheet("background-color: rgba(255,255,255,5%); border: 1px solid #444;")
 
     def set_board_enabled(self, status):
         for i in range(3):
             for j in range(3):
                 if self.board_buttons[i][j].text() == "":
                     self.board_buttons[i][j].setEnabled(status)
+                    if status:
+                        self.board_buttons[i][j].setStyleSheet("background-color: rgba(255,255,255,15%); border: 1px solid #888;")
 
     def show_help_screen(self):
-        self.serveroutput.setText("HELP: Watch the Status bar for your turn. Get 3 in a row to win!")
+        self.serveroutput.setText("HELP: Connect to a server, wait for your turn, and click an empty cell. 3 in a row wins!")
 
     def switch_theme(self):
         self.current_theme = "light" if self.current_theme == "dark" else "dark"
@@ -248,14 +268,15 @@ class TicTacToe(QWidget, GameClient):
 
     def apply_theme(self):
         if self.current_theme == "dark":
-            bg, text, btn_color = "#002147", "white", "#004488"
+            bg, text, btn_box = "#002147", "white", "#004488"
             self.closebutton.setStyleSheet("background-color:#aa3333; color:white;")
         else:
-            bg, text, btn_color = "#f0f0f0", "#111111", "#d0d0d0"
+            bg, text, btn_box = "#f0f0f0", "#111111", "#d0d0d0"
             self.closebutton.setStyleSheet("background-color:#ff6666; color:black;")
         
         self.setStyleSheet(f"background-color: {bg}; color: {text};")
-        self.serveroutput.setStyleSheet(f"background-color: {btn_color}; border: 1px solid gray; padding: 10px; border-radius: 5px;")
+        self.serveroutput.setStyleSheet(f"background-color: {btn_box}; border: 1px solid gray; padding: 10px; border-radius: 5px; color: {text};")
+        self.score_display.setStyleSheet(f"color: {text}; border: 1px solid gray; padding: 5px;")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
