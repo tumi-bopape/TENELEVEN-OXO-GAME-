@@ -1,0 +1,17 @@
+OXO Game Server Started: 2026-05-09 13:30:32.289940
+*** OXO GAME SERVER STARTED ***
+Waiting for client connections.
+Connected Client 0: ('127.0.0.1', 49425)
+Connected Client 1: ('196.47.249.157', 51613)
+Sent Message Client 1: new game,O
+Sent Message Client 0: new game,X
+Sent Message Client 1: your move
+Sent Message Client 0: opponents move
+Received Message Client 1: 
+Sent Message Client 1: invalid move
+ERROR:[WinError 10053] An established connection was aborted by the software in your host machine
+
+Game Server is being restarted.
+
+*** OXO GAME SERVER STARTED ***
+Waiting for client connections.
