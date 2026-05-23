@@ -9,6 +9,7 @@ Ultimate OXO is a two-player network Tic-Tac-Toe game that allows players to con
 The backend networking structure and server-side framework were provided. Our contribution focused on designing and developing the final user interface and enhancing the overall gameplay experience in final_oxo_game.py.
 
 Features ✨
+
 Multiplayer gameplay over a local network
 Interactive PyQt5 graphical user interface
 Real-time game updates between players
@@ -18,7 +19,9 @@ Restart and new match functionality
 Help screen for user guidance
 Connection status updates and game logs
 Color-coded game pieces for better visual feedback
+
 Technologies Used 🛠️
+
 Python 3
 PyQt5
 Socket Programming
