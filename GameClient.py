@@ -1,5 +1,3 @@
-# DO NOT MODIFY THIS FILE
-
 from datetime import *
 from socket import *
 from GameIni import *
