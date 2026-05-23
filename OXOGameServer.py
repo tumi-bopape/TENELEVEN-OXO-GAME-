@@ -1,5 +1,3 @@
-# DO NOT MODIFY THIS FILE
-
 from GameServer import *
 from random import *
 
